@@ -25,502 +25,181 @@ load_dotenv()  # Load environment variables from .env file
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Enums for standardized data
-class EducationLevel(str, Enum):
-    HIGH_SCHOOL = "high_school"
-    ASSOCIATE = "associate"
-    BACHELOR = "bachelor"
-    MASTER = "master"
-    PHD = "phd"
-    CERTIFICATE = "certificate"
-    DIPLOMA = "diploma"
-    PROFESSIONAL = "professional"
 
-class ExperienceLevel(str, Enum):
-    ENTRY = "entry"
-    JUNIOR = "junior"
-    MID = "mid"
-    SENIOR = "senior"
-    LEAD = "lead"
-    MANAGER = "manager"
-    DIRECTOR = "director"
-    VP = "vp"
-    EXECUTIVE = "executive"
+# Simplified Pydantic Models for Resume Components
 
-class SkillProficiency(str, Enum):
-    BEGINNER = "beginner"
-    INTERMEDIATE = "intermediate"
-    ADVANCED = "advanced"
-    EXPERT = "expert"
 
-class EmploymentType(str, Enum):
-    FULL_TIME = "full_time"
-    PART_TIME = "part_time"
-    CONTRACT = "contract"
-    FREELANCE = "freelance"
-    INTERNSHIP = "internship"
-    VOLUNTEER = "volunteer"
+class ExternalLinks(BaseModel):
+    """External profile links and websites."""
 
-# Detailed Pydantic Models for Resume Components
+    linkedin: Optional[str] = Field(None, description="LinkedIn profile URL")
+    github: Optional[str] = Field(None, description="GitHub profile URL")
+    portfolio: Optional[str] = Field(None, description="Personal portfolio/website URL")
+    other: Optional[List[str]] = Field(
+        default_factory=list, description="Other relevant links"
+    )
+
 
 class ContactInfo(BaseModel):
-    """Contact information from the resume."""
-    email: Optional[EmailStr] = Field(
-        None,
-        description="Primary email address of the candidate"
-    )
-    phone: Optional[str] = Field(
-        None,
-        description="Primary phone number in any format"
-    )
-    secondary_phone: Optional[str] = Field(
-        None,
-        description="Secondary or mobile phone number if different from primary"
-    )
-    address: Optional[str] = Field(
-        None,
-        description="Full address including street, city, state, and postal code"
-    )
-    city: Optional[str] = Field(
-        None,
-        description="City of residence"
-    )
-    state: Optional[str] = Field(
-        None,
-        description="State or province of residence"
-    )
-    country: Optional[str] = Field(
-        None,
-        description="Country of residence"
-    )
-    postal_code: Optional[str] = Field(
-        None,
-        description="ZIP or postal code"
-    )
+    """Basic contact information."""
 
-    @validator('phone', 'secondary_phone')
-    def validate_phone(cls, v):
-        if v and len(re.sub(r'[^0-9]', '', v)) < 10:
-            raise ValueError('Phone number must contain at least 10 digits')
-        return v
+    email: Optional[str] = Field(None, description="Email address")
+    phone: Optional[str] = Field(None, description="Phone number")
+    location: Optional[str] = Field(None, description="City, State/Country")
 
-class SocialLinks(BaseModel):
-    """Social media and professional links."""
-    linkedin: Optional[HttpUrl] = Field(
-        None,
-        description="LinkedIn profile URL"
-    )
-    github: Optional[HttpUrl] = Field(
-        None,
-        description="GitHub profile URL"
-    )
-    portfolio: Optional[HttpUrl] = Field(
-        None,
-        description="Personal portfolio or website URL"
-    )
-    twitter: Optional[HttpUrl] = Field(
-        None,
-        description="Twitter profile URL"
-    )
-    other_links: Optional[List[HttpUrl]] = Field(
-        default_factory=list,
-        description="Any other professional or relevant links"
-    )
-
-class Skill(BaseModel):
-    """Individual skill with proficiency level."""
-    name: str = Field(
-        ...,
-        description="Name of the skill or technology"
-    )
-    category: Optional[str] = Field(
-        None,
-        description="Category of skill (e.g., programming, database, framework)"
-    )
-    proficiency: Optional[SkillProficiency] = Field(
-        None,
-        description="Proficiency level of the skill"
-    )
-    years_of_experience: Optional[float] = Field(
-        None,
-        ge=0,
-        description="Number of years of experience with this skill"
-    )
-    is_primary: Optional[bool] = Field(
-        False,
-        description="Whether this is a primary/core skill"
-    )
 
 class Education(BaseModel):
-    """Educational qualification details."""
-    institution: str = Field(
-        ...,
-        description="Name of the educational institution"
-    )
-    degree: str = Field(
-        ...,
-        description="Degree or qualification obtained"
-    )
-    field_of_study: Optional[str] = Field(
-        None,
-        description="Major, specialization, or field of study"
-    )
-    level: Optional[EducationLevel] = Field(
-        None,
-        description="Level of education"
-    )
-    start_date: Optional[date] = Field(
-        None,
-        description="Start date of the education"
-    )
-    end_date: Optional[date] = Field(
-        None,
-        description="End date or expected graduation date"
-    )
-    gpa: Optional[float] = Field(
-        None,
-        ge=0.0,
-        le=4.0,
-        description="GPA on a 4.0 scale"
-    )
-    grade: Optional[str] = Field(
-        None,
-        description="Grade or class (e.g., First Class, Distinction)"
-    )
-    location: Optional[str] = Field(
-        None,
-        description="Location of the institution"
-    )
-    honors: Optional[List[str]] = Field(
-        default_factory=list,
-        description="Academic honors, awards, or recognitions"
-    )
-    relevant_coursework: Optional[List[str]] = Field(
-        default_factory=list,
-        description="Relevant courses or subjects studied"
-    )
-    thesis_title: Optional[str] = Field(
-        None,
-        description="Title of thesis or major project if applicable"
-    )
-    is_current: bool = Field(
-        False,
-        description="Whether this education is currently ongoing"
-    )
+    """Educational qualification."""
+
+    institution: str = Field(..., description="School/University name")
+    degree: str = Field(..., description="Degree obtained")
+    field_of_study: Optional[str] = Field(None, description="Major/Field of study")
+    graduation_year: Optional[str] = Field(None, description="Graduation year or date")
+
 
 class WorkExperience(BaseModel):
-    """Work experience details."""
-    company: str = Field(
-        ...,
-        description="Name of the company or organization"
-    )
-    position: str = Field(
-        ...,
-        description="Job title or position held"
-    )
-    department: Optional[str] = Field(
-        None,
-        description="Department or division within the company"
-    )
-    employment_type: Optional[EmploymentType] = Field(
-        None,
-        description="Type of employment"
-    )
-    start_date: Optional[date] = Field(
-        None,
-        description="Start date of employment"
-    )
-    end_date: Optional[date] = Field(
-        None,
-        description="End date of employment (None if current)"
-    )
-    location: Optional[str] = Field(
-        None,
-        description="Location of the job (city, state/country)"
+    """Work experience entry."""
+
+    company: str = Field(..., description="Company name")
+    position: str = Field(..., description="Job title")
+    duration: Optional[str] = Field(
+        None, description="Duration (e.g., '2020-2023' or '2 years')"
     )
     description: Optional[str] = Field(
-        None,
-        description="Overall job description or summary"
+        None, description="Brief job description and achievements"
     )
-    responsibilities: Optional[List[str]] = Field(
-        default_factory=list,
-        description="List of key responsibilities and duties"
-    )
-    achievements: Optional[List[str]] = Field(
-        default_factory=list,
-        description="List of key achievements and accomplishments"
-    )
-    technologies_used: Optional[List[str]] = Field(
-        default_factory=list,
-        description="Technologies, tools, or skills used in this role"
-    )
-    team_size: Optional[int] = Field(
-        None,
-        ge=1,
-        description="Size of the team managed or worked with"
-    )
-    is_current: bool = Field(
-        False,
-        description="Whether this is the current position"
-    )
+
 
 class Project(BaseModel):
-    """Project details from resume."""
-    name: str = Field(
-        ...,
-        description="Name or title of the project"
-    )
-    description: str = Field(
-        ...,
-        description="Detailed description of the project"
-    )
+    """Project details."""
+
+    name: str = Field(..., description="Project name")
+    description: str = Field(..., description="Project description")
     technologies: Optional[List[str]] = Field(
-        default_factory=list,
-        description="Technologies, frameworks, or tools used"
+        default_factory=list, description="Technologies used"
     )
-    role: Optional[str] = Field(
-        None,
-        description="Role or responsibility in the project"
-    )
-    start_date: Optional[date] = Field(
-        None,
-        description="Project start date"
-    )
-    end_date: Optional[date] = Field(
-        None,
-        description="Project end date"
-    )
-    url: Optional[HttpUrl] = Field(
-        None,
-        description="URL to project demo, repository, or documentation"
-    )
-    achievements: Optional[List[str]] = Field(
-        default_factory=list,
-        description="Key achievements or outcomes of the project"
-    )
-    is_professional: bool = Field(
-        False,
-        description="Whether this was a professional/work project"
-    )
+    url: Optional[str] = Field(None, description="Project URL/link")
+
 
 class Certification(BaseModel):
-    """Professional certifications and licenses."""
-    name: str = Field(
-        ...,
-        description="Name of the certification"
-    )
-    issuing_organization: str = Field(
-        ...,
-        description="Organization that issued the certification"
-    )
-    issue_date: Optional[date] = Field(
-        None,
-        description="Date when certification was issued"
-    )
-    expiration_date: Optional[date] = Field(
-        None,
-        description="Date when certification expires"
-    )
-    credential_id: Optional[str] = Field(
-        None,
-        description="Certification ID or credential number"
-    )
-    url: Optional[HttpUrl] = Field(
-        None,
-        description="URL to verify the certification"
-    )
-    is_active: bool = Field(
-        True,
-        description="Whether the certification is currently active"
-    )
+    """Certification details."""
 
-class Language(BaseModel):
-    """Language proficiency information."""
-    language: str = Field(
-        ...,
-        description="Name of the language"
-    )
-    proficiency: Optional[str] = Field(
-        None,
-        description="Proficiency level (e.g., Native, Fluent, Intermediate, Basic)"
-    )
-    is_native: bool = Field(
-        False,
-        description="Whether this is a native language"
-    )
+    name: str = Field(..., description="Certification name")
+    issuer: str = Field(..., description="Issuing organization")
+    date: Optional[str] = Field(None, description="Issue date or year")
+
 
 class Resume(BaseModel):
-    """Complete resume data structure with comprehensive fields."""
-    
+    """Simplified resume data structure."""
+
     # Basic Information
-    full_name: str = Field(
-        ...,
-        description="Full name of the candidate as it appears on the resume"
+    full_name: str = Field(..., description="Full name of the candidate")
+    email: Optional[str] = Field(None, description="Email address")
+    phone: Optional[str] = Field(None, description="Phone number")
+    location: Optional[str] = Field(None, description="City, State/Country")
+
+    # External Links
+    external_links: Optional[ExternalLinks] = Field(
+        None, description="LinkedIn, GitHub, portfolio, and other professional links"
     )
-    
-    professional_title: Optional[str] = Field(
-        None,
-        description="Professional title or desired position"
+
+    # Professional Summary
+    summary: Optional[str] = Field(
+        None, description="Professional summary or objective"
     )
-    
-    # Contact and Links
-    contact_info: ContactInfo = Field(
-        ...,
-        description="Contact information including email, phone, and address"
-    )
-    
-    social_links: Optional[SocialLinks] = Field(
-        None,
-        description="Social media and professional profile links"
-    )
-    
-    # Summary and Objective
-    professional_summary: Optional[str] = Field(
-        None,
-        description="Professional summary or objective statement from the resume"
-    )
-    
+
     # Skills
-    technical_skills: List[Skill] = Field(
-        default_factory=list,
-        description="Technical skills, programming languages, tools, and technologies"
+    skills: List[str] = Field(
+        default_factory=list, description="List of technical and professional skills"
     )
-    
-    soft_skills: List[str] = Field(
-        default_factory=list,
-        description="Soft skills and interpersonal abilities"
-    )
-    
+
     # Experience
     work_experience: List[WorkExperience] = Field(
-        default_factory=list,
-        description="Professional work experience history"
+        default_factory=list, description="Work experience history"
     )
-    
-    total_years_experience: Optional[float] = Field(
-        None,
-        ge=0,
-        description="Total years of professional experience"
-    )
-    
-    experience_level: Optional[ExperienceLevel] = Field(
-        None,
-        description="Overall experience level of the candidate"
-    )
-    
+
     # Education
     education: List[Education] = Field(
-        default_factory=list,
-        description="Educational background and qualifications"
+        default_factory=list, description="Educational background"
     )
-    
-    highest_education_level: Optional[EducationLevel] = Field(
-        None,
-        description="Highest level of education achieved"
-    )
-    
-    # Projects and Additional Information
+
+    # Projects
     projects: List[Project] = Field(
-        default_factory=list,
-        description="Personal, academic, or professional projects"
+        default_factory=list, description="Notable projects"
     )
-    
+
+    # Certifications
     certifications: List[Certification] = Field(
-        default_factory=list,
-        description="Professional certifications and licenses"
+        default_factory=list, description="Professional certifications"
     )
-    
-    languages: List[Language] = Field(
-        default_factory=list,
-        description="Language proficiencies"
-    )
-    
-    # Metadata
-    keywords: List[str] = Field(
-        default_factory=list,
-        description="Key terms and keywords extracted from the resume"
-    )
-    
-    parsing_confidence: Optional[float] = Field(
-        None,
-        ge=0.0,
-        le=1.0,
-        description="Confidence score of the parsing accuracy"
-    )
+
 
 class ResumeParser:
     """Main resume parser class using Instructor for structured extraction."""
-    
-    def __init__(self, api_key: str, model: str = "gpt-4", temperature: float = 0.1):
-        self.client =  Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+    def __init__(
+        self,
+        api_key: str = None,
+        model: str = "llama-3.3-70b-versatile",
+        temperature: float = 0.1,
+    ):
+        # Initialize Groq client and patch it with Instructor
+        groq_client = Groq(api_key=api_key or os.getenv("GROQ_API_KEY"))
+        self.client = instructor.from_groq(groq_client)
         self.model = model
         self.temperature = temperature
-        logger.info(f"Initialized ResumeParser with model: {model}")
-    
+        logger.info(f"Initialized ResumeParser with Groq model: {model}")
+
     def extract_text_from_pdf(self, file_path: str) -> str:
         """Extract text from PDF file."""
-        with open(file_path, 'rb') as file:
+        with open(file_path, "rb") as file:
             reader = PyPDF2.PdfReader(file)
             text = ""
             for page in reader.pages:
                 text += page.extract_text() + "\n"
             return text
-    
+
     def extract_text_from_docx(self, file_path: str) -> str:
         """Extract text from DOCX file."""
         doc = docx.Document(file_path)
         return "\n".join([paragraph.text for paragraph in doc.paragraphs])
-    
+
     def parse_resume(self, resume_text: str) -> Resume:
-        """Parse resume text into structured data using comprehensive prompting."""
-        
+        """Parse resume text into structured data."""
+
         system_prompt = """
-        You are an expert HR professional and resume parser. Extract comprehensive, 
-        structured information from the resume text with high accuracy.
+        You are an expert resume parser. Extract information from resumes accurately and structure it cleanly.
         
         EXTRACTION GUIDELINES:
-        1. Extract ALL relevant information present in the resume
-        2. For dates, use YYYY-MM-DD format when possible
-        3. Categorize skills appropriately (technical vs soft skills)  
-        4. Parse work experience with detailed responsibilities and achievements
-        5. Include education with proper degree classification
-        6. Extract projects, certifications, and contact information thoroughly
-        7. Maintain data integrity - use null for unclear information
-        8. Calculate experience levels based on years and roles
-        9. Extract keywords and technical terms mentioned
-        10. Ensure contact information is properly formatted
-        
-        SKILL CLASSIFICATION:
-        - Technical: Programming languages, frameworks, databases, tools, software
-        - Soft: Leadership, communication, teamwork, problem-solving
-        
-        EXPERIENCE LEVELS:
-        - entry: 0-2 years
-        - junior: 2-4 years
-        - mid: 4-7 years  
-        - senior: 7-12 years
-        - lead/manager: 10+ years with leadership
-        
-        Extract comprehensive data ensuring no important details are missed.
+        1. Extract name, email, phone, and location from contact info
+        2. Find LinkedIn, GitHub, portfolio URLs and other external links
+        3. Extract professional summary/objective
+        4. List all skills mentioned (technical and soft skills combined)
+        5. Parse work experience with company, position, duration, and key achievements
+        6. Extract education with institution, degree, field, and graduation year
+        7. Find projects with descriptions and technologies used
+        8. Extract certifications with issuer and date
+        9. Use null/empty for missing information
+        10. Keep descriptions concise but informative
         """
-        
+
         user_prompt = f"""
-        Parse this resume and extract all information into the structured format:
+        Parse this resume and extract the information:
         
         RESUME TEXT:
         {resume_text}
         
-        Extract:
-        - Personal and contact information
-        - Professional summary/objective
-        - Complete work experience with achievements
-        - Educational background and qualifications
-        - Technical and soft skills with proficiency
-        - Projects with technologies and outcomes
-        - Certifications and validity periods
-        - Languages, awards, and additional information
+        Extract all available information including:
+        - Name and contact details (email, phone, location)
+        - External links (LinkedIn, GitHub, portfolio, etc.)
+        - Professional summary
+        - Skills
+        - Work experience
+        - Education
+        - Projects
+        - Certifications
         """
-        
+
         try:
             parsed_resume = self.client.chat.completions.create(
                 model=self.model,
@@ -528,28 +207,121 @@ class ResumeParser:
                 response_model=Resume,
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
+                    {"role": "user", "content": user_prompt},
                 ],
-                max_retries=3
+                max_retries=3,
             )
-            
-            # Set parsing confidence
-            parsed_resume.parsing_confidence = 0.9
-            
+
             logger.info("Resume parsing completed successfully")
             return parsed_resume
-            
+
         except Exception as e:
             logger.error(f"Error during resume parsing: {e}")
             raise
-    
+
     def export_to_json(self, resume: Resume, file_path: str = None) -> str:
         """Export parsed resume to JSON format."""
         json_data = resume.model_dump(exclude_none=True)
         json_string = json.dumps(json_data, indent=2, default=str)
-        
+
         if file_path:
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.write(json_string)
-                
+
         return json_string
+
+
+if __name__ == "__main__":
+    # Test the parser with resume_f.pdf
+    print("=" * 60)
+    print("Testing Resume Parser with Groq + Instructor")
+    print("=" * 60)
+
+    try:
+        # Initialize parser
+        parser = ResumeParser()
+        print("\n✓ Parser initialized successfully")
+
+        # Extract text from PDF
+        pdf_path = "resume_f.pdf"
+        print(f"\n📄 Extracting text from: {pdf_path}")
+        resume_text = parser.extract_text_from_pdf(pdf_path)
+        print(f"✓ Extracted {len(resume_text)} characters")
+        print(f"\nFirst 500 characters:\n{resume_text[:500]}...")
+
+        # Parse resume
+        print("\n🤖 Parsing resume with Groq LLM...")
+        parsed_resume = parser.parse_resume(resume_text)
+        print("✓ Resume parsed successfully!")
+
+        # Display key information
+        print("\n" + "=" * 60)
+        print("PARSED RESUME SUMMARY")
+        print("=" * 60)
+        print(f"\n👤 Name: {parsed_resume.full_name}")
+        print(f"📧 Email: {parsed_resume.email or 'Not provided'}")
+        print(f"📱 Phone: {parsed_resume.phone or 'Not provided'}")
+        print(f"📍 Location: {parsed_resume.location or 'Not provided'}")
+
+        # External Links
+        if parsed_resume.external_links:
+            print("\n🔗 External Links:")
+            if parsed_resume.external_links.linkedin:
+                print(f"   LinkedIn: {parsed_resume.external_links.linkedin}")
+            if parsed_resume.external_links.github:
+                print(f"   GitHub: {parsed_resume.external_links.github}")
+            if parsed_resume.external_links.portfolio:
+                print(f"   Portfolio: {parsed_resume.external_links.portfolio}")
+            if parsed_resume.external_links.other:
+                for link in parsed_resume.external_links.other:
+                    print(f"   Other: {link}")
+
+        if parsed_resume.summary:
+            print(f"\n📝 Summary: {parsed_resume.summary[:200]}...")
+
+        print(f"\n🎓 Education: {len(parsed_resume.education)} entries")
+        for edu in parsed_resume.education:
+            print(f"   - {edu.degree} from {edu.institution}")
+            if edu.graduation_year:
+                print(f"     Year: {edu.graduation_year}")
+
+        print(f"\n💼 Work Experience: {len(parsed_resume.work_experience)} positions")
+        for exp in parsed_resume.work_experience:
+            print(f"   - {exp.position} at {exp.company}")
+            if exp.duration:
+                print(f"     Duration: {exp.duration}")
+
+        print(f"\n🛠️  Skills: {len(parsed_resume.skills)} skills")
+        for i, skill in enumerate(parsed_resume.skills[:15], 1):  # Show first 15
+            print(f"   {i}. {skill}")
+
+        if len(parsed_resume.skills) > 15:
+            print(f"   ... and {len(parsed_resume.skills) - 15} more")
+
+        print(f"\n🚀 Projects: {len(parsed_resume.projects)} projects")
+        for proj in parsed_resume.projects:
+            print(f"   - {proj.name}")
+
+        print(
+            f"\n📜 Certifications: {len(parsed_resume.certifications)} certifications"
+        )
+        for cert in parsed_resume.certifications:
+            print(f"   - {cert.name} from {cert.issuer}")
+
+        # Export to JSON
+        output_path = "parsed_resume.json"
+        json_output = parser.export_to_json(parsed_resume, output_path)
+        print(f"\n✓ Full results exported to: {output_path}")
+
+        print("\n" + "=" * 60)
+        print("✅ Test completed successfully!")
+        print("=" * 60)
+
+    except FileNotFoundError as e:
+        print(f"\n❌ Error: resume_f.pdf not found in current directory")
+        print(f"   Make sure the file exists at: {os.path.abspath('resume_f.pdf')}")
+    except Exception as e:
+        print(f"\n❌ Error during parsing: {e}")
+        import traceback
+
+        traceback.print_exc()
