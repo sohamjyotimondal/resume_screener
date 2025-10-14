@@ -138,7 +138,7 @@ def parse_resume_file(file_path: str, output_json_path: str = None) -> dict:
     logger.info(f"Extracted {len(resume_text)} characters from {file_path}")
 
     # Step 2: Parse resume text using LLM
-    parser = ResumeParser()
+    parser = ResumeParser(model="openai/gpt-oss-120b")
     parsed_resume = parser.parse_resume(resume_text)
     logger.info("Resume parsed successfully")
 

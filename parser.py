@@ -28,6 +28,13 @@ class ExternalLinks(BaseModel):
     linkedin: Optional[str] = Field(None, description="LinkedIn profile URL")
     github: Optional[str] = Field(None, description="GitHub profile URL")
     portfolio: Optional[str] = Field(None, description="Personal portfolio/website URL")
+    twitter: Optional[str] = Field(None, description="Twitter profile URL")
+    leetcode: Optional[str] = Field(None, description="LeetCode profile URL")
+    kaggle: Optional[str] = Field(None, description="Kaggle profile URL")
+    hackerrank: Optional[str] = Field(None, description="HackerRank profile URL")
+    medium: Optional[str] = Field(None, description="Medium profile URL")
+    researchgate: Optional[str] = Field(None, description="ResearchGate profile URL")
+
     other: Optional[List[str]] = Field(
         default_factory=list, description="Other relevant links"
     )
@@ -60,16 +67,18 @@ class WorkExperience(BaseModel):
         None, description="Duration (e.g., '2020-2023' or '2 years')"
     )
     description: Optional[str] = Field(
-        None, description="Brief job description and achievements"
+        None,
+        description="Brief job description and achievements. remove corporate jargon . make it short to the point",
     )
 
 
 class Project(BaseModel):
     """Project details."""
 
-    name: str = Field(..., description="Project name")
+    name: Optional[str] = Field(..., description="Project name")
     description: str = Field(
-        ..., description="Project description in very short summary"
+        ...,
+        description="Project description in very short summary. Remove corporate jargon . make it short to the point",
     )
     skills: List[str] = Field(
         default_factory=list,
@@ -123,19 +132,6 @@ class Resume(BaseModel):
         description="linkedin, github, portfolio, and other professional links. For other links Mention what link is it (e.g., Leetcode, Kaggle, Twitter, etc.)",
     )
     # Skills,tech stack
-    skills: List[str] = Field(
-        default_factory=list,
-        description="List of technical and professional skills, tech stack used, languages known , services known (AWS Aure Pinecone etc)etc. Include everything mentioned by user directly  and any skill or tech stack  which the user may have missed but can be inferred from other parts of the resume like project publication certification etc.",
-    )
-
-    tech_stack: List[str] = Field(
-        default_factory=list,
-        description="List of technologies and tools the candidate is proficient in. This can include programming languages, frameworks, libraries, and other tools.",
-    )
-    # Professional Summary
-    summary: Optional[str] = Field(
-        None, description="Professional summary or objective"
-    )
 
     # Experience
     work_experience: List[WorkExperience] = Field(
@@ -165,6 +161,10 @@ class Resume(BaseModel):
     awards_honors: List[AwardHonor] = Field(
         default_factory=list, description="Awards, honors, rankings etc."
     )
+    skills: List[str] = Field(
+        default_factory=list,
+        description="List of technical and professional skills, tech stack used, languages known , services known (AWS Aure Pinecone etc)etc. Include everything mentioned by user directly  and any skill or tech stack  which the user may have missed but can be inferred from other parts of the resume like project publication certification etc.",
+    )
 
     # Publications
     publications: List[str] = Field(
@@ -183,7 +183,7 @@ class ResumeParser:
     ):
         # Initialize Groq client and patch it with Instructor
         groq_client = Groq(api_key=api_key or os.getenv("GROQ_API_KEY"))
-        self.client = instructor.from_groq(groq_client)
+        self.client = instructor.from_groq(groq_client, mode=instructor.Mode.JSON)
         self.model = model
         self.temperature = temperature
         logger.info(f"Initialized ResumeParser with Groq model: {model}")
