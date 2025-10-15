@@ -34,11 +34,11 @@ class SkillMatch(BaseModel):
         default_factory=list,
         description="Skills from resume that match job requirements"
     )
-    missing_skills: List[str] = Field(
+    missing_skills: Optional[List[str]] = Field(
         default_factory=list,
-        description="Critical skills mentioned in job description but missing in resume"
+        description="Critical skills mentioned in job description but missing in resume. "
     )
-    additional_skills: List[str] = Field(
+    additional_skills: Optional[List[str]] = Field(
         default_factory=list,
         description="Relevant skills candidate has beyond job requirements"
     )
@@ -116,7 +116,7 @@ class ProjectMatch(BaseModel):
     )
     relevant_projects: List[str] = Field(
         default_factory=list,
-        description="Projects that demonstrate relevant skills/experience"
+        description="Projects that demonstrate relevant skills/experience. Keep only the projects which are similiar to what the job profile is. Be choosy in picking the projects and choose 1 always but after that choose only if you think anything else is matching"
     )
     key_technologies: List[str] = Field(
         default_factory=list,

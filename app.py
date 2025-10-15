@@ -4,10 +4,12 @@ Shows how to integrate ResumeProcessor with Flask for file uploads
 """
 
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from main import ResumeProcessor
 import logging
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 logging.basicConfig(level=logging.INFO)
 
 # Initialize the processor once at startup
