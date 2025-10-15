@@ -68,21 +68,27 @@ Just open `frontend/index.html` in a browser. That's it.
 - **Python-docx** – Word doc parsing
 - Vanilla HTML/CSS/JS for the frontend
 
-## Sample response
+## Example outputs
+
+Want to see what the actual output looks like? Check these out:
+
+- **[Parsed resume example](backend/parsed_resume.json)** – See how the parser extracts structured data from a resume
+- **[Screening result example](backend/screening_result.json)** – Full screening analysis with scores and recommendations
+
+### Quick sample
 
 ```json
 {
-  "overall_score": 8.5,
-  "recommendation": "Strong Match",
-  "summary": "Candidate has solid experience with required tech stack...",
+  "overall_score": 7.83,
+  "recommendation": "Potential Match",
   "skill_match": {
-    "score": 8.8,
-    "matched_skills": ["Python", "React", "PostgreSQL"],
-    "missing_skills": ["Kubernetes"],
-    "additional_skills": ["Docker", "Redis"]
+    "score": 8.5,
+    "matched_skills": ["Python", "Java", "JavaScript", "CI/CD"],
+    "missing_skills": ["Direct experience with AWS, GCP, or Azure"],
+    "additional_skills": ["Machine Learning", "NLP", "Computer Vision"]
   },
-  "strengths": ["5 years Python experience", "Led team of 4"],
-  "concerns": ["No experience with cloud deployment"]
+  "strengths": ["Strong technical skills", "Impressive project portfolio"],
+  "concerns": ["Limited experience in software development"]
 }
 ```
 
