@@ -178,7 +178,7 @@ class ResumeParser:
     def __init__(
         self,
         api_key: str = None,
-        model: str = "llama-3.3-70b-versatile",
+        model: str = "llama-3.3-70b-versatile", #using openai/gpt-oss-120b
         temperature: float = 0.1,
     ):
         # Initialize Groq client and patch it with Instructor
