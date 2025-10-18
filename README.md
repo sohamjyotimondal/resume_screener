@@ -27,6 +27,8 @@ Takes the boring out of resume screening. The AI reads through resumes, pulls ou
 
 - **Flexible fields** – All fields are optional. Got a resume without a portfolio? No problem. Missing education? We'll work with what we have
 
+- **Smart caching** – Same resume uploaded twice? We remember it. Only re-screens if the job description changes. Saves time and API costs
+
 ## How to use
 
 ### Backend setup
@@ -36,10 +38,16 @@ cd backend
 pip install -r requirements.txt
 ```
 
-Create a `.env` file with your Groq API key:
+Create a `.env` file with your API keys:
 ```
-GROQ_API_KEY=your_key_here
+GROQ_API_KEY=your_groq_key_here
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
 ```
+
+**Optional: Set up caching** (recommended!)
+- See [backend/SUPABASE_SETUP.md](backend/SUPABASE_SETUP.md) for Supabase cache setup
+- Without caching, the app still works but will be slower and more expensive
 
 Run the server:
 ```bash

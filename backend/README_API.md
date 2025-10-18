@@ -4,6 +4,8 @@
 
 The Resume Processor is a class-based API for parsing and screening resumes using LLMs (Groq + Instructor). It's designed for easy integration with Flask/FastAPI backends.
 
+**✨ New: Two-level caching with Supabase!** Cache parsed resumes and screening results to save time and API costs. 
+
 ## Architecture
 
 ```
