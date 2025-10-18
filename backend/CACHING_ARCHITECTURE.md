@@ -107,7 +107,6 @@ Flow:
   8. Return result
 
 LLM Calls: 2
-Time: ~5-10 seconds
 ```
 
 ### Scenario B: Same Resume, Different Job
@@ -123,8 +122,6 @@ Flow:
   6. Return result
 
 LLM Calls: 1
-Time: ~3-5 seconds
-Savings: 50% faster!
 ```
 
 ### Scenario C: Same Resume, Same Job (Duplicate)
@@ -137,8 +134,6 @@ Flow:
   3. Return cached result
 
 LLM Calls: 0
-Time: <1 second
-Savings: Instant! No API costs!
 ```
 
 ### Scenario D: Updated Resume, Same Job
@@ -156,8 +151,6 @@ Flow:
   8. Return result
 
 LLM Calls: 2
-Time: ~5-10 seconds
-Note: Correctly treats updated resume as new!
 ```
 
 ## Key Benefits
